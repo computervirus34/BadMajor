@@ -56,9 +56,10 @@
             border: 0px solid #ccc;
         }
 
-        .hiddenFiled{
-            display:none;
-        }
+    .hiddenFiled {
+        display: none;
+    }
+
     .Pager span {
         text-align: center;
         color: #333;
@@ -114,7 +115,7 @@
                         }
                     }
                     console.log(states.toString());
-
+                    $("#major_grouping_desc").prop("disabled", false);
                     $("#instnm").prop("disabled", false);
                     $("#instnm").empty();
                     $.ajax({
@@ -146,7 +147,7 @@
     <div class="col-md-2">
         @Html.LabelFor(model => model.major_grouping_desc, htmlAttributes: new { @class = "control-label ddlLabel" })
         @Html.ListBoxFor(model => model.major_grouping_desc, new SelectList(@Model.majorGroupingList, "value", "text"),
-                 new { @class = "form-control input-md ddlValue" })
+                 new { @class = "form-control input-md ddlValue", @disabled = "true" })
         @Html.ValidationMessageFor(model => model.major_grouping_desc, "", new { @class = "text-danger" })
     </div>
     <script type="text/javascript">
@@ -223,7 +224,7 @@
         <tr>
             <th>Degree Type</th>
             <th>State</th>
-            <th>College of State</th>
+            <th>College</th>
             <th>Major Group</th>
             <th>Major</th>
             <th data-toggle="tooltip" data-placement="bottom" title="Expected cost for one year">Cost</th>
@@ -239,14 +240,17 @@
         </tr>
     </thead>
     <tbody>
-
     </tbody>
 </table>
-
+<div id="dialog" style="display: none">
+</div>
 <br />
 <div class="Pager"></div>
+<link href="~/Content/jquery-ui.css" rel="stylesheet" />
 
 <script src="~/Scripts/ASPSnippets_Pager.min.js"></script>
+<script src="~/Scripts/jquery-ui.min.js"></script>
+
 <script type="text/javascript">
     var currencyFormatter = new Intl.NumberFormat('en-US', {
         style: 'currency',
@@ -315,8 +319,10 @@
                     var FeesAndOtherExp = currencyFormatter.format(response.FeesAndOtherExp);
                     var RoomAndBoard = currencyFormatter.format(response.RoomAndBoard);
                     var Books = currencyFormatter.format(response.Books);
+                    var message = "1. In State Tuition:" + InStateTuition + "<br/>2. Out of State Tuition:" + OutStateTuition + "<br/>3. Fees and Other Expenses:" + FeesAndOtherExp + "<br/>4. Room and Board:" + RoomAndBoard + "<br/>5. Books:" + Books;
+                    ShowPopup(message);
 
-                    alert("1.  In State Tuition:" + InStateTuition + "\n2. Out of State Tuition:" + OutStateTuition + "\n3.  Fees and Other Expenses:" + FeesAndOtherExp + "\n4. Room and Board:" + RoomAndBoard + "\n5. Books:" + Books);
+                    //alert(message);
                 },
                 error: function (xhr, status, error) {
                     console.log(error);
@@ -328,7 +334,15 @@
     //$("body").on("click", ".Pager .page", function () {
     //    GetEarningsDetails(parseInt($(this).attr('page')));
     //});
-
+    function ShowPopup(message) {
+        $(function () {
+            $("#dialog").html(message);
+            $("#dialog").dialog({
+                title: "Cost Breakout for 1 year",
+                modal: true
+            });
+        });
+    };
     function GetValuesToReport() {
         var creddescs = [];
         var instnms = [];
@@ -474,3 +488,11 @@
     //    });
     //}
 </script>
+@*<link href="~/Content/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <script src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#tblEarnings').DataTable();
+        });
+    </script>*@
