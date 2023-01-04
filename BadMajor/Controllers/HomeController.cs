@@ -108,7 +108,8 @@ namespace BadMajor.Controllers
             earningDetails.RecordCount = earningDetails.Reports.Count();
             int startIndex = (pageIndex - 1) * earningDetails.PageSize;
 
-            earningDetails.Reports = earningDetails.Reports.Take(10).ToList();
+            earningDetails.Reports = earningDetails.Reports.Skip(startIndex)
+                .Take(earningDetails.PageSize).ToList();;
 
             return Json(earningDetails, JsonRequestBehavior.AllowGet);
         }

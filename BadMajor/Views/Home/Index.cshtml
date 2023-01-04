@@ -245,7 +245,7 @@
 <div id="dialog" style="display: none">
 </div>
 <br />
-<div class="Pager"></div>
+<div id="pagination"></div>
 <link href="~/Content/jquery-ui.css" rel="stylesheet" />
 
 <script src="~/Scripts/ASPSnippets_Pager.min.js"></script>
@@ -261,7 +261,7 @@
 
         $("#btnSubmit").click(function () {
             debugger;
-            GetValuesToReport();
+            GetValuesToReport(1);
         });
 
         $('#tblEarnings').on('change', 'input', function () {
@@ -297,6 +297,16 @@
                     console.log(error);
                 }
             });
+        });
+
+        $('#pagination').on('click', 'a', function (event) {
+            
+            event.preventDefault();
+            var page = $(this).data('page');
+            console.log('Page:'+page);
+            //var data = getDataForPage(page);
+            $('#tblEarnings tbody').empty();
+            GetValuesToReport(page);
         });
 
         $('#tblEarnings').on('click', 'button', function () {
@@ -343,7 +353,7 @@
             });
         });
     };
-    function GetValuesToReport() {
+    function GetValuesToReport(pageIndex) {
         var creddescs = [];
         var instnms = [];
         var major_grouping_descs = [];
@@ -379,7 +389,7 @@
         }
         console.log(cipcodes.toString());
 
-        GetEarningsDetails(1, creddescs, instnms, major_grouping_descs, cipcodes);
+        GetEarningsDetails(pageIndex, creddescs, instnms, major_grouping_descs, cipcodes);
     }
     function GetEarningsDetails(pageIndex, creddesc, instnm, major_grouping_desc, cipCode) {
         debugger;
@@ -432,8 +442,16 @@
             row += '</tr>';
             $('#tblEarnings tbody').append(row);
         }
+        generatePagination(response.RecordCount / 10, response.PageIndex);
     }
-
+    function generatePagination(totalPages, currentPage) {
+        $('#pagination').empty();
+        for (var i = 1; i <= totalPages; i++) {
+            var activeClass = i == currentPage ? 'active' : '';
+            var link = '<a href="#" data-page="' + i + '" class="' + activeClass + '">' + i + '</a>';
+            $('#pagination').append(link);
+        }
+    }
     //function OnSuccessOld(response) {
     //    let i = 1;
     //    var model = response;
@@ -488,11 +506,4 @@
     //    });
     //}
 </script>
-@*<link href="~/Content/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" />
-    <script src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
 
-    <script>
-        $(document).ready(function () {
-            $('#tblEarnings').DataTable();
-        });
-    </script>*@
