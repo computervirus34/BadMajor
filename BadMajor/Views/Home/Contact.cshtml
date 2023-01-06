@@ -1,0 +1,55 @@
+﻿@model BadMajor.ContactFormModel
+
+
+<style>
+    #tblContact{
+        padding:20px;
+    }
+    #tblContact tr td{
+        padding:5px 5px;
+    }
+</style>
+<p style="padding-left:10px;">If you see any inaccuracies, missing majors, or general feedback, please contact us.</p>    
+<div>
+@using (Html.BeginForm("Contact", "Home", FormMethod.Post))
+{
+    <table id="tblContact" style="padding-left:10px;">
+        <tr>
+            <td style="width: 80px">Name:</td>
+            <td>@Html.EditorFor(model => model.Name, 
+                    new { @class = "form-control col-md-6 col-sm-12", @disabled = "true" })</td>
+        </tr>
+        <tr>
+            <td>Subject:</td>
+            <td>
+                @Html.EditorFor(model => model.Subject,
+                        new { @class = "form-control input-xs input-md" })
+                    </td>
+        </tr>
+        <tr>
+            <td>Email:</td>
+            <td>@Html.EditorFor(model => model.Email,
+               new { @class = "form-control input-xs input-md" })</td>
+        </tr>
+        <tr>
+            <td>Body:</td>
+            <td>@Html.TextAreaFor(model => model.Body, 
+               new { @class = "form-control input-xs input-md", @rows = "5", @cols="20" })</td>
+        </tr>
+        @*<tr>
+            <td></td>
+            <td>@Html.TextBoxFor(model => model.Attachment, new { type = "file" })</td>
+        </tr>*@
+        <tr>
+            <td></td>
+            <td><input type="submit" class="btn btn-primary" value="Send" /></td>
+        </tr>
+    </table>
+    <br />
+    <span style="color:green">@ViewBag.Message</span>
+}
+</div>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/4.0.20/tinymce.min.js"></script>
+<script type="text/javascript">
+    tinymce.init({ selector: 'textarea', width: 270 });
+</script>

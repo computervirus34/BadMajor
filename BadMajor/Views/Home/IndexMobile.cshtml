@@ -3,6 +3,89 @@
 @{
     ViewBag.Title = "Index";
 }
+<style type="text/css">
+    body {
+        font-family: Helvetica, arial, sans-serif;
+        font-size: 8px;
+    }
+
+    .header {
+        font-family: Helvetica, arial, sans-serif;
+        font-size: 10px;
+    }
+
+    .ddlLabel {
+        font-family: Helsinki, arial, helvetica, sans-serif;
+        font-size: 10px;
+        display: block;
+        font-weight: bold;
+        text-align: center;
+        color: rgb(94, 4, 17);
+    }
+
+    .ddlValue {
+        font-size: 8px;
+        font-weight: lighter;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 8px;
+        color: rgb(94, 94, 94);
+    }
+
+    table {
+        border: 1px solid #ccc;
+        border-collapse: collapse;
+        background-color: #fff;
+    }
+
+
+        table th {
+            background-color: #B8DBFD;
+            color: #333;
+            font-weight: bold;
+        }
+
+
+        table th, table td {
+            padding: 5px;
+            border: 1px solid #ccc;
+        }
+
+
+        table, table table td {
+            border: 0px solid #ccc;
+        }
+
+    #divGrade {
+        padding-top: 20px;
+        font-weight: bold;
+        color: rgb(94, 94, 94);
+        font-size: 20px;
+    }
+
+    .hiddenFiled {
+        display: none;
+    }
+
+    .pagination {
+        display: inline-block;
+    }
+
+        .pagination a {
+            color: black;
+            float: left;
+            padding: 8px 16px;
+            text-decoration: none;
+        }
+
+            .pagination a.active {
+                background-color: #4CAF50;
+                color: white;
+            }
+
+            .pagination a:hover:not(.active) {
+                background-color: #ddd;
+            }
+</style>
 
 @*@using (Html.BeginForm())
     {
@@ -12,14 +95,14 @@
 <div class="row" style="padding-top:20px;">
     <div class="col-md-2">
         @Html.LabelFor(model => model.creddesc, htmlAttributes: new { @class = "control-label ddlLabel" })
-        @Html.ListBoxFor(model => model.creddesc, new SelectList(@Model.creddescList, "value", "text"),
-             new { @class = "form-control input-md ddlValue" })
+        @Html.DropDownListFor(model => model.creddesc, new SelectList(@Model.creddescList, "value", "text"),
+             new { @class = "form-control input-xs input-md" })
         @Html.ValidationMessageFor(model => model.creddesc, "", new { @class = "text-danger" })
     </div>
     <div class="col-md-2">
         @Html.LabelFor(model => model.state, htmlAttributes: new { @class = "control-label ddlLabel" })
-        @Html.ListBoxFor(model => model.state, new SelectList(@Model.stateList, "value", "text"),
-             new { @class = "form-control input-md ddlValue" })
+        @Html.DropDownListFor(model => model.state, new SelectList(@Model.stateList, "value", "text"),
+             new { @class = "form-control input-xs input-md" })
         @Html.ValidationMessageFor(model => model.state, "", new { @class = "text-danger" })
     </div>
     <script type="text/javascript">
@@ -27,31 +110,22 @@
                 $("#state").change(function () {
                     debugger;
                     var states = [];
-                    var x = document.getElementById("state");
-                    for (var i = 0; i < x.options.length; i++) {
-                        if (x.options[i].selected == true) {
-                            states.push(x.options[i].value);
-                        }
-                    }
+                    //var x = document.getElementById("state");
+                    states.push($("#state").val());
                     console.log(states.toString());
 
                     var creddescs = [];
-                    var x = document.getElementById("creddesc");
-                    for (var i = 0; i < x.options.length; i++) {
-                        if (x.options[i].selected == true) {
-                            creddescs.push(x.options[i].value);
-                        }
-                    }
+                    var x = $("#creddesc").val();
+                    creddescs.push(x);
                     console.log(creddescs.toString());
-
-                    $("#major_grouping_desc").prop("disabled", false);
+                    //$("#major_grouping_desc").prop("disabled", false);
                     $("#instnm").prop("disabled", false);
                     $("#instnm").empty();
                     $.ajax({
                         type: 'POST',
                         url: '@Url.Action("getInstnm")',
                         dataType: 'json',
-                        data: { states: states, credential_id: creddescs  },
+                        data: { states: states, credential_id: creddescs },
                         success: function (instnm) {
                             $.each(instnm, function (i, instnm) {
                                 $("#instnm").append('<option value="'
@@ -69,14 +143,46 @@
     </script>
     <div class="col-md-3">
         @Html.LabelFor(model => model.instnm, htmlAttributes: new { @class = "control-label ddlLabel" })
-        @Html.ListBoxFor(model => model.instnm, new SelectList(String.Empty, "value", "text"),
-            new { @class = "form-control input-md ddlValue", @disabled = "true" })
+        @Html.DropDownListFor(model => model.instnm, new SelectList(String.Empty, "value", "text"),
+            new { @class = "form-control input-xs input-md", @disabled = "true" })
         @Html.ValidationMessageFor(model => model.instnm, "", new { @class = "text-danger" })
     </div>
+    <script type="text/javascript">
+            $(document).ready(function () {
+                $("#instnm").change(function () {
+                    debugger;
+                    var instnms = [];
+                    //var x = document.getElementById("state");
+                    instnms.push($("#instnm").val());
+                    console.log(instnms.toString());
+
+                    $("#major_grouping_desc").prop("disabled", false);
+                    //$("#instnm").prop("disabled", false);
+                    $("#major_grouping_desc").empty();
+                    $.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("GetMajorGroup")',
+                        dataType: 'json',
+                        data: { insts: instnms },
+                        success: function (majorgroups) {
+                            $.each(majorgroups, function (i, majorgroups) {
+                                $("#major_grouping_desc").append('<option value="'
+                                    + majorgroups.Value + '">'
+                                    + majorgroups.Text + '</option>');
+                            });
+                        },
+                        error: function (ex) {
+                            //alert('Failed.' + ex);
+                        }
+                    });
+                });
+                return false;
+            });
+    </script>
     <div class="col-md-2">
         @Html.LabelFor(model => model.major_grouping_desc, htmlAttributes: new { @class = "control-label ddlLabel" })
-        @Html.ListBoxFor(model => model.major_grouping_desc, new SelectList(@Model.majorGroupingList, "value", "text"),
-                 new { @class = "form-control input-md ddlValue", @disabled = "true" })
+        @Html.DropDownListFor(model => model.major_grouping_desc, new SelectList(String.Empty, "value", "text"),
+                 new { @class = "form-control input-xs input-md", @disabled = "true" })
         @Html.ValidationMessageFor(model => model.major_grouping_desc, "", new { @class = "text-danger" })
     </div>
     <script type="text/javascript">
@@ -87,26 +193,16 @@
                     var instnms = [];
                     var major_grouping_descs = [];
 
-                    var x = document.getElementById("creddesc");
-                    for (var i = 0; i < x.options.length; i++) {
-                        if (x.options[i].selected == true) {
-                            creddescs.push(x.options[i].value);
-                        }
-                    }
+                    var x = $("#creddesc").val();
+                    creddescs.push(x);
                     console.log(creddescs.toString());
-                    var x = document.getElementById("instnm");
-                    for (var i = 0; i < x.options.length; i++) {
-                        if (x.options[i].selected == true) {
-                            instnms.push(x.options[i].value);
-                        }
-                    }
+
+                    var x = $("#instnm").val();
+                    instnms.push(x);
                     console.log(instnms.toString());
-                    var x = document.getElementById("major_grouping_desc");
-                    for (var i = 0; i < x.options.length; i++) {
-                        if (x.options[i].selected == true) {
-                            major_grouping_descs.push(x.options[i].value);
-                        }
-                    }
+
+                    var x = $("#major_grouping_desc").val();
+                    major_grouping_descs.push(x);
                     console.log(major_grouping_descs.toString());
                     debugger
                     $("#major").prop("disabled", false);
@@ -133,34 +229,32 @@
     </script>
     <div class="col-md-3">
         @Html.LabelFor(model => model.major, htmlAttributes: new { @class = "control-label ddlLabel" })
-        @Html.ListBoxFor(model => model.major, new SelectList(String.Empty, "value", "text"),
-                    new { @class = "form-control input-md ddlValue", @disabled = "true" })
+        @Html.DropDownListFor(model => model.major, new SelectList(String.Empty, "value", "text"),
+                    new { @class = "form-control input-xs input-md", @disabled = "true" })
         @Html.ValidationMessageFor(model => model.major, "", new { @class = "text-danger" })
     </div>
 
 </div>
 <div class="row">
-    <div class="col-md-2 offset-5">
+    <div class="text-center">
         <br />
         <input type="submit" id="btnSubmit" value="Search" class="btn btn-default btn-primary" />
     </div>
 </div>
+<div class="row">
+    <div class="text-center" id="divGrade">
 
+    </div>
+</div>
 
 <hr />
 <table id="tblEarnings" class="table table-bordered" cellpadding="0" cellspacing="0" style="font-size:10px;">
     <thead>
         <tr>
-            <th>Degree Type</th>
-            <th>State</th>
-            <th>College</th>
-            <th>Major Group</th>
-            <th>Major</th>
             <th data-toggle="tooltip" data-placement="bottom" title="Expected cost for one year">Cost</th>
             <th data-toggle="tooltip" data-placement="top" title="Expected Earnings 1 year after graduation">Earnings</th>
             <th data-toggle="tooltip" data-placement="top" title="Return on Investment.This is how much more money you will make over your lifetime than you would if you did not get this degree.The calculation is based on the cost and future value of your degree.">ROI</th>
             <th>Years to Recoup</th>
-            <th data-toggle="tooltip" data-placement="top" title="This is the letter grade BadMajors assigns this degree from this institution. It is based on the cost and future value of your degree compared to what it would be if you did not pursue the degree. It is meant to provide a quick way to gauge the program you are considering.">Grade</th>
             <th data-toggle="tooltip" data-placement="top" title="The average earnings of the degree type that is the equivalent of the degree you are pursuing">Equivalent</th>
             <th class="hiddenFiled"></th>
             <th class="hiddenFiled"></th>
@@ -174,10 +268,9 @@
 <div id="dialog" style="display: none">
 </div>
 <br />
-<div id="pagination"></div>
+<div id="pagination" class="pagination"></div>
 <link href="~/Content/jquery-ui.css" rel="stylesheet" />
 
-<script src="~/Scripts/ASPSnippets_Pager.min.js"></script>
 <script src="~/Scripts/jquery-ui.min.js"></script>
 
 <script type="text/javascript">
@@ -198,10 +291,10 @@
             // get the value of the input field
             var inputValue = $(this).val().replace(/[^\d.-]/g, '');;
             var row_index = $(this).closest("tr").index();
-            var degree = $(this).closest('tr').find('td:eq(11)').text();
-            var instCode = $(this).closest('tr').find('td:eq(12)').text();
-            var majorGroup = $(this).closest('tr').find('td:eq(13)').text();
-            var majorCode = $(this).closest('tr').find('td:eq(14)').text();
+            var degree = $(this).closest('tr').find('td:eq(5)').text();
+            var instCode = $(this).closest('tr').find('td:eq(6)').text();
+            var majorGroup = $(this).closest('tr').find('td:eq(7)').text();
+            var majorCode = $(this).closest('tr').find('td:eq(8)').text();
 
             console.log('Input value:', inputValue);
             console.log('Row:', row_index);
@@ -219,7 +312,8 @@
                     $('#input-' + row_index).val(formattedCost);
                     $('#roi-' + row_index).text(formattedRoi);
                     $('#years-' + row_index).text(response.years_to_recoup_cost);
-                    $('#grade-' + row_index).text(response.grade);
+                    //$('#grade-' + row_index).text(response.grade);
+                    $("#divGrade").text(response.grade);
                     //}
                 },
                 error: function (xhr, status, error) {
@@ -229,7 +323,7 @@
         });
 
         $('#pagination').on('click', 'a', function (event) {
-            
+
             event.preventDefault();
             var page = $(this).data('page');
             console.log('Page:'+page);
@@ -242,7 +336,7 @@
             debugger;
             // get the value of the input field
             var row_index = $(this).closest("tr").index();
-            var instCode = $(this).closest('tr').find('td:eq(12)').text();
+            var instCode = $(this).closest('tr').find('td:eq(6)').text();
             console.log('Row:', row_index);
             console.log('Code:', instCode);
             // send an AJAX request to the server with the updated data
@@ -288,34 +382,20 @@
         var major_grouping_descs = [];
         var cipcodes = [];
 
-        var x = document.getElementById("creddesc");
-        for (var i = 0; i < x.options.length; i++) {
-            if (x.options[i].selected == true) {
-                creddescs.push(x.options[i].value);
-            }
-        }
+        var x = $("#creddesc").val();
+        creddescs.push(x);
         console.log(creddescs.toString());
-        var x = document.getElementById("instnm");
-        for (var i = 0; i < x.options.length; i++) {
-            if (x.options[i].selected == true) {
-                instnms.push(x.options[i].value);
-            }
-        }
+
+        var x = $("#instnm").val();
+        instnms.push(x);
         console.log(instnms.toString());
-        var x = document.getElementById("major_grouping_desc");
-        for (var i = 0; i < x.options.length; i++) {
-            if (x.options[i].selected == true) {
-                major_grouping_descs.push(x.options[i].value);
-            }
-        }
+
+        var x = $("#major_grouping_desc").val();
+        major_grouping_descs.push(x);
         console.log(major_grouping_descs.toString());
 
-        var x = document.getElementById("major");
-        for (var i = 0; i < x.options.length; i++) {
-            if (x.options[i].selected == true) {
-                cipcodes.push(x.options[i].value.toString());
-            }
-        }
+        var x = $("#major").val();
+        cipcodes.push(x);
         console.log(cipcodes.toString());
 
         GetEarningsDetails(pageIndex, creddescs, instnms, major_grouping_descs, cipcodes);
@@ -345,24 +425,19 @@
     }
     function OnSuccess(response) {
         $('#tblEarnings tbody').empty();
-
+        $("#divGrade").empty();
         for (var i = 0; i < response.Reports.length; i++) {
             //var earnings = this;
+            $("#divGrade").text(response.Reports[0]['grade']);
             var formattedCost = currencyFormatter.format(response.Reports[i]['cost']);
             var formattedEarnings = currencyFormatter.format(response.Reports[i]['earnings']);
             var formattedRoi = isNaN(response.Reports[i]['roi']) ? response.Reports[i]['roi'] : currencyFormatter.format(response.Reports[i]['roi']);
 
             var row = '<tr>';
-            row += '<td>' + response.Reports[i]['creddesc'] + '</td>';
-            row += '<td>' + response.Reports[i]['state'] + '</td>';
-            row += '<td>' + response.Reports[i]['instnm'] + '</td>';
-            row += '<td>' + response.Reports[i]['major_grouping_desc'] + '</td>';
-            row += '<td>' + response.Reports[i]['major'] + '</td>';
-            row += '<td><input id="input-' + i + '" type="text" value="' + formattedCost + '"><button id="button-'+ i + '">Break Down</button></td>';
+            row += '<td><input id="input-' + i + '" class="input-xs input-md" type="text" value="' + formattedCost + '"><button id="button-'+ i + '">Break Down</button></td>';
             row += '<td>' + formattedEarnings + '</td>';
             row += '<td id="roi-' + i + '">' + formattedRoi + '</td>';
             row += '<td id="years-' + i +'">' + response.Reports[i]['years_to_recoup_cost'] + '</td>';
-            row += '<td id="grade-' + i +'">' + response.Reports[i]['grade'] + '</td>';
             row += '<td>' + response.Reports[i]['equivalent'] + '</td>';
             row += '<td class="hiddenFiled">' + response.Reports[i]['degree'] + '</td>';
             row += '<td class="hiddenFiled">' + response.Reports[i]['instCode'] + '</td>';
@@ -381,58 +456,26 @@
             $('#pagination').append(link);
         }
     }
-    //function OnSuccessOld(response) {
-    //    let i = 1;
-    //    var model = response;
-    //    console.log(model.Reports);
-    //    var row = $("#tblEarnings tr:last-child").removeAttr("style").clone(true);
-    //    $("#tblEarnings tr").not($("#tblEarnings tr:first-child")).remove();
-    //    $.each(model.Reports, function () {
-    //        var earnings = this;
-    //        $("td", row).eq(0).html(earnings.creddesc);
-    //        $("td", row).html('<input type=hidden value=' + earnings.creddesc + ' class="cred_id" />');
-    //        $("td", row).html('<input type=hidden value=' + earnings.instnm + ' class="instnm" />');
-    //        $("td", row).html('<input type=hidden value=' + earnings.major_grouping_desc + ' class="major_grouping_desc" />');
-    //        $("td", row).html('<input type=hidden value=' + earnings.major + ' class="major" />');
-    //        $("td", row).eq(1).html(earnings.state);
-    //        $("td", row).eq(2).html(earnings.instnm);
-    //        $("td", row).eq(3).html(earnings.major_grouping_desc);
-    //        $("td", row).eq(4).html(earnings.major);
-    //        $("td", row).eq(5).html('<input class="costInput" length=8 min=0 type=number value=' + earnings.cost +' onkeyup="ReCalculateROI(false)" id=costInput'+i +' />');
-    //        $("td", row).eq(6).html(earnings.earnings);
-    //        $("td", row).eq(7).html(earnings.roi);
-    //        $("td", row).eq(8).html(earnings.years_to_recoup_cost);
-    //        $("td", row).eq(9).html(earnings.grade);
-    //        $("td", row).eq(10).html(earnings.equivalent);
-    //        $("#tblEarnings").append(row);
-    //        row = $("#tblEarnings tr:last-child").clone(true);
-    //        i += 1;
-    //    });
-    //    $(".Pager").ASPSnippets_Pager({
-    //        ActiveCssClass: "current",
-    //        PagerCssClass: "pager",
-    //        PageIndex: model.PageIndex,
-    //        PageSize: model.PageSize,
-    //        RecordCount: model.RecordCount
-    //    });
-    //};
+</script>
+<link href="~/Content/css/select2.min.css" rel="stylesheet" />
+<script src="~/Scripts/select2.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#creddesc").val($("#creddesc option:selected").val());
+        $("#state").val($("#state option:selected").val());
+        $("#instnm").val($("#instnm option:selected").val());
+        $("#major").val($("#major option:selected").val());
+        $("#major_grouping_desc").val($("#major_grouping_desc option:selected").val());
+    });
+</script>
 
-
-    //function updateData() {
-    //    // Update the data on the server when a cell is edited
-    //    var cellValue = $(this).val();
-    //    var rowIndex = $(this).closest('tr').index();
-    //    var colIndex = $(this).closest('td').index();
-
-    //    $.ajax({
-    //        url: '/api/updateData',
-    //        type: 'POST',
-    //        data: {
-    //            rowIndex: rowIndex,
-    //            colIndex: colIndex,
-    //            value: cellValue
-    //        }
-    //    });
-    //}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#creddesc").select2();
+        $("#state").select2();
+        $("#instnm").select2();
+        $("#major").select2();
+        $("#major_grouping_desc").select2();
+    });
 </script>
 

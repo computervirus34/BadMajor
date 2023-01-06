@@ -1,9 +1,13 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Globalization;
 using System.Linq;
+using System.Net;
+using System.Net.Configuration;
+using System.Net.Mail;
 using System.Web;
 using System.Web.Mvc;
 
@@ -14,8 +18,112 @@ namespace BadMajor.Controllers
         // GET: Home
         public ActionResult Index()
         {
-            ReportViewModel spv = new ReportViewModel();
+            try
+            {
+                ReportViewModel spv = new ReportViewModel();
+                SetInitialListValues(spv);
+                return View(spv);
+            }
+            catch (Exception ex)
+            {
+                TempData["retMsg"] = ex.Message;
+                return RedirectToAction("ErrorPage");
+            }
 
+        }
+
+
+        public ActionResult IndexMobile()
+        {
+            try
+            {
+                ReportViewModel spv = new ReportViewModel();
+                SetInitialListValues(spv);
+                return View(spv);
+            }
+            catch (Exception ex)
+            {
+                TempData["retMsg"] = ex.Message;
+                return RedirectToAction("ErrorPage");
+            }
+
+        }
+
+        public ActionResult FAQ()
+        {
+            return View();
+
+        }
+
+        public ActionResult Contact()
+        {
+            return View();
+
+        }
+
+        [HttpPost]
+        public ActionResult Contact(ContactFormModel model)
+        {
+            //Read SMTP section from Web.Config.
+            SmtpSection smtpSection = (SmtpSection)ConfigurationManager.GetSection("system.net/mailSettings/smtp");
+            SendEmail(smtpSection, model);
+            //using (MailMessage mm = new MailMessage(smtpSection.From, "ahsan34.07@gmail.com"))
+            //{
+            //    mm.Subject = model.Subject;
+            //    mm.Body = "Name: " + model.Name + "<br /><br />Email: " + model.Email + "<br />" + model.Body;
+
+            //    mm.IsBodyHtml = true;
+
+            //    using (SmtpClient smtp = new SmtpClient())
+            //    {
+            //        smtp.Host = smtpSection.Network.Host;
+            //        smtp.EnableSsl = smtpSection.Network.EnableSsl;
+            //        NetworkCredential networkCred = new NetworkCredential(smtpSection.Network.UserName, smtpSection.Network.Password);
+            //        smtp.UseDefaultCredentials = true;
+            //        smtp.Credentials = networkCred;
+            //        smtp.Port = smtpSection.Network.Port;
+            //        smtp.Send(mm);
+            //        ViewBag.Message = "Email sent sucessfully.";
+            //    }
+            //}
+
+            return View();
+        }
+
+        public void SendEmail(SmtpSection smtpSection, ContactFormModel contact)
+        {
+            try
+            {
+                using (MailMessage mail = new MailMessage())
+                {
+                    mail.From = new MailAddress(smtpSection.From);
+                    mail.To.Add(smtpSection.From);
+                    mail.Subject = contact.Subject;
+                    mail.Body = contact.Body;
+                    mail.IsBodyHtml = true;
+                    //mail.Attachments.Add(new Attachment("D:\\TestFile.txt"));//--Uncomment this to send any attachment  
+                    using (SmtpClient smtp = new SmtpClient(smtpSection.Network.Host, smtpSection.Network.Port))
+                    {
+                        smtp.Credentials = new NetworkCredential(smtpSection.From, smtpSection.Network.Password);
+                        smtp.EnableSsl = smtpSection.Network.EnableSsl;
+                        smtp.UseDefaultCredentials = smtpSection.Network.DefaultCredentials;
+                        smtp.Send(mail);
+                        ViewBag.Message = "Email sent sucessfully.";
+                    }
+                }
+            }catch(Exception ex)
+            {
+                ViewBag.Message = ex.Message;
+            }
+            
+        }
+        public ActionResult ErrorPage()
+        {
+            return View();
+        }
+
+        public void SetInitialListValues(ReportViewModel spv)
+        {
             string query = @"SELECT credential_id value, creddesc description 
                                 FROM dim_credential 
                                 where creddesc != 'Highschool Diploma' 
@@ -28,20 +136,13 @@ namespace BadMajor.Controllers
 
             spv.stateList = GetDropDownListValue(query, "dim_state");
 
-            query = @"SELECT major_grouping_id value, major_grouping_desc description 
-                        FROM dim_major_grouping 
-                        ORDER BY major_grouping_desc";
-
-            spv.majorGroupingList = GetDropDownListValue(query, "dim_major_grouping");
-
-            return View(spv);
+            //spv.majorGroupingList = GetDropDownListValue(query, "dim_major_grouping");
         }
-        
         public IEnumerable<SelectListItem> GetDropDownListValue(string query, string dtName)
         {
             MySqlConnection con = DatabaseConnection.getDBConnection();
-            
-            if(con.State != ConnectionState.Open)
+
+            if (con.State != ConnectionState.Open)
                 con.Open();
 
             MySqlCommand cmd = new MySqlCommand(query, con);
@@ -51,7 +152,7 @@ namespace BadMajor.Controllers
             con.Close();
 
             var data = dt.AsEnumerable().Select(row =>
-                        new 
+                        new
                         {
                             value = row["value"].ToString(),
                             description = row["description"].ToString()
@@ -59,12 +160,33 @@ namespace BadMajor.Controllers
 
             return new SelectList(data.ToList(), "value", "description");
         }
-        public JsonResult getInstnm(List<string> states)
+        public JsonResult getInstnm(List<string> states, List<int> credential_id)
         {
             string inStates = string.Join(",", states.Select(i => $"'{i}'"));
-            string query = $"SELECT institution_id value, INSTNM description FROM dim_institution where STABBR in ({inStates}) ORDER BY INSTNM";
+            string credential_ids = String.Join(", ", credential_id.Select(n => n.ToString(CultureInfo.InvariantCulture)));
+            string query = @"SELECT distinct i.institution_id value, INSTNM description 
+                                FROM dim_institution i
+                                INNER JOIN fct_major f ON f.institution_id = i.institution_id";
+
+
+            query = $"{query} where STABBR in ({inStates}) and f.credential_id IN ({credential_ids}) ORDER BY INSTNM";
             List<SelectListItem> liState = GetDropDownListValue(query, "dim_institution").ToList();
             return Json(new SelectList(liState, "value", "text", JsonRequestBehavior.AllowGet));
+        }
+
+        public JsonResult GetMajorGroup(List<string> insts)
+        {
+            string instIds = string.Join(",", insts.Select(i => $"'{i}'"));
+
+            string query = @"SELECT distinct mg.major_grouping_id value, major_grouping_desc description 
+                                FROM dim_major_grouping mg
+                                JOIN dim_major m ON m.major_grouping_id = mg.major_grouping_id
+                                JOIN fct_major fm ON fm.major_id = m.major_id
+                                JOIN dim_institution ins ON ins.institution_id = fm.institution_id";
+
+            query = $"{query} WHERE fm.institution_id IN({instIds}) ORDER BY major_grouping_desc; ";
+            List<SelectListItem> liIns = GetDropDownListValue(query, "dim_major_group").ToList();
+            return Json(new SelectList(liIns, "value", "text", JsonRequestBehavior.AllowGet));
         }
 
         public JsonResult getMajor(List<int> credential_id, List<int> instId, List<int> major_grouping_id)
@@ -109,7 +231,7 @@ namespace BadMajor.Controllers
             int startIndex = (pageIndex - 1) * earningDetails.PageSize;
 
             earningDetails.Reports = earningDetails.Reports.Skip(startIndex)
-                .Take(earningDetails.PageSize).ToList();;
+                .Take(earningDetails.PageSize).ToList(); ;
 
             return Json(earningDetails, JsonRequestBehavior.AllowGet);
         }

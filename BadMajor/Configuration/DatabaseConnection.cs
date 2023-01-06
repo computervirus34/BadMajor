@@ -12,12 +12,20 @@ namespace BadMajor
         static MySqlConnection databaseConnection = null;
         public static MySqlConnection getDBConnection()
         {
-            if (databaseConnection == null)
+            try
             {
-                string connectionString = ConfigurationManager.ConnectionStrings["MysqlConnection"].ConnectionString;
-                databaseConnection = new MySqlConnection(connectionString);
+                if (databaseConnection == null)
+                {
+                    string connectionString = ConfigurationManager.ConnectionStrings["MysqlConnection"].ConnectionString;
+                    databaseConnection = new MySqlConnection(connectionString);
+                }
+                return databaseConnection;
             }
-            return databaseConnection;
+            catch
+            {
+                throw;
+            }
+            
         }
     }
 }
