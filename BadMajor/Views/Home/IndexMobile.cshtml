@@ -6,17 +6,20 @@
 <style type="text/css">
     body {
         font-family: Helvetica, arial, sans-serif;
-        font-size: 8px;
+        @* font-size: 8px; *@
+        font-size: 16px;
     }
 
     .header {
         font-family: Helvetica, arial, sans-serif;
+        @*font-size: 10px;*@
         font-size: 10px;
     }
 
     .ddlLabel {
         font-family: Helsinki, arial, helvetica, sans-serif;
-        font-size: 10px;
+        @*font-size: 10px;*@
+        font-size: 16px;
         display: block;
         font-weight: bold;
         text-align: center;
@@ -24,7 +27,8 @@
     }
 
     .ddlValue {
-        font-size: 8px;
+        @*font-size: 8px;*@
+        font-size: 12px;
         font-weight: lighter;
         font-family: Arial, Helvetica, sans-serif;
         font-size: 8px;
@@ -58,8 +62,10 @@
     #divGrade {
         padding-top: 20px;
         font-weight: bold;
-        color: rgb(94, 94, 94);
-        font-size: 20px;
+        @*color: rgb(94, 94, 94);*@
+        color: rgb(94, 9, 9);
+        @*font-size: 20px; *@
+        font-size: 60px;
     }
 
     .hiddenFiled {
@@ -248,19 +254,20 @@
 </div>
 
 <hr />
-<table id="tblEarnings" class="table table-bordered" cellpadding="0" cellspacing="0" style="font-size:10px;">
+@*<table id="tblEarnings" class="table table-bordered" cellpadding="0" cellspacing="0" style="font-size:10px;">*@
+<table id="tblEarnings" class="table table-bordered" cellpadding="0" cellspacing="0" style="font-size:16px;">
     <thead>
-        <tr>
-            <th data-toggle="tooltip" data-placement="bottom" title="Expected cost for one year">Cost</th>
-            <th data-toggle="tooltip" data-placement="top" title="Expected Earnings 1 year after graduation">Earnings</th>
-            <th data-toggle="tooltip" data-placement="top" title="Return on Investment.This is how much more money you will make over your lifetime than you would if you did not get this degree.The calculation is based on the cost and future value of your degree.">ROI</th>
-            <th>Years to Recoup</th>
-            <th data-toggle="tooltip" data-placement="top" title="The average earnings of the degree type that is the equivalent of the degree you are pursuing">Equivalent</th>
-            <th class="hiddenFiled"></th>
-            <th class="hiddenFiled"></th>
-            <th class="hiddenFiled"></th>
-            <th class="hiddenFiled"></th>
-        </tr>
+        @* <tr>
+                <th data-toggle="tooltip" data-placement="bottom" title="Expected cost for one year">Cost</th>
+                <th data-toggle="tooltip" data-placement="top" title="Expected Earnings 1 year after graduation">Earnings</th>
+                <th data-toggle="tooltip" data-placement="top" title="Return on Investment.This is how much more money you will make over your lifetime than you would if you did not get this degree.The calculation is based on the cost and future value of your degree.">ROI</th>
+                <th>Years to Recoup</th>
+                <th data-toggle="tooltip" data-placement="top" title="The average earnings of the degree type that is the equivalent of the degree you are pursuing">Equivalent</th>
+                <th class="hiddenFiled"></th>
+                <th class="hiddenFiled"></th>
+                <th class="hiddenFiled"></th>
+                <th class="hiddenFiled"></th>
+            </tr> *@
     </thead>
     <tbody>
     </tbody>
@@ -274,188 +281,211 @@
 <script src="~/Scripts/jquery-ui.min.js"></script>
 
 <script type="text/javascript">
-    var currencyFormatter = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-        minimumFractionDigits: 0
-    });
-    $(document).ready(function () {
-
-        $("#btnSubmit").click(function () {
-            debugger;
-            GetValuesToReport(1);
-        });
-
-        $('#tblEarnings').on('change', 'input', function () {
-            debugger;
-            // get the value of the input field
-            var inputValue = $(this).val().replace(/[^\d.-]/g, '');;
-            var row_index = $(this).closest("tr").index();
-            var degree = $(this).closest('tr').find('td:eq(5)').text();
-            var instCode = $(this).closest('tr').find('td:eq(6)').text();
-            var majorGroup = $(this).closest('tr').find('td:eq(7)').text();
-            var majorCode = $(this).closest('tr').find('td:eq(8)').text();
-
-            console.log('Input value:', inputValue);
-            console.log('Row:', row_index);
-            // send an AJAX request to the server with the updated data
-            $.ajax({
-                type: "POST",
-                url: '@Url.Action("GetCostChangeResult")',
-                dataType: 'json',
-                data: { credential_id: degree, instId: instCode, major_grouping_id: majorGroup, cipCode: majorCode, cost:inputValue },
-                success: function (response) {
-                    var formattedCost = currencyFormatter.format(inputValue);
-                    var formattedRoi = isNaN(response.roi) ? response.roi : currencyFormatter.format(response.roi);
-                    console.log(response.roi + '-' + response.years_to_recoup_cost);
-                    //if (response.length == 1) {
-                    $('#input-' + row_index).val(formattedCost);
-                    $('#roi-' + row_index).text(formattedRoi);
-                    $('#years-' + row_index).text(response.years_to_recoup_cost);
-                    //$('#grade-' + row_index).text(response.grade);
-                    $("#divGrade").text(response.grade);
-                    //}
-                },
-                error: function (xhr, status, error) {
-                    console.log(error);
-                }
+            var currencyFormatter = new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0
             });
-        });
+            $(document).ready(function () {
 
-        $('#pagination').on('click', 'a', function (event) {
+                $("#btnSubmit").click(function () {
+                    debugger;
+                    GetValuesToReport(1);
+                });
 
-            event.preventDefault();
-            var page = $(this).data('page');
-            console.log('Page:'+page);
-            //var data = getDataForPage(page);
-            $('#tblEarnings tbody').empty();
-            GetValuesToReport(page);
-        });
+                $('#tblEarnings').on('change', 'input', function () {
+                    debugger;
+                    // get the value of the input field
+                    var inputValue = $(this).val().replace(/[^\d.-]/g, '');;
+                    var row_index = $(this).closest("tr").index();
+                    var degree = $(this).closest('tr').find('td:eq(5)').text();
+                    var instCode = $(this).closest('tr').find('td:eq(6)').text();
+                    var majorGroup = $(this).closest('tr').find('td:eq(7)').text();
+                    var majorCode = $(this).closest('tr').find('td:eq(8)').text();
 
-        $('#tblEarnings').on('click', 'button', function () {
-            debugger;
-            // get the value of the input field
-            var row_index = $(this).closest("tr").index();
-            var instCode = $(this).closest('tr').find('td:eq(6)').text();
-            console.log('Row:', row_index);
-            console.log('Code:', instCode);
-            // send an AJAX request to the server with the updated data
-            $.ajax({
-                type: "POST",
-                url: '@Url.Action("GetCostBreakDown")',
-                dataType: 'json',
-                data: { instCode: instCode},
-                success: function (response) {
-                    console.log(response);
-                    var InStateTuition = currencyFormatter.format(response.InStateTuition);
-                    var OutStateTuition = currencyFormatter.format(response.OutStateTuition);
-                    var FeesAndOtherExp = currencyFormatter.format(response.FeesAndOtherExp);
-                    var RoomAndBoard = currencyFormatter.format(response.RoomAndBoard);
-                    var Books = currencyFormatter.format(response.Books);
-                    var message = "1. In State Tuition:" + InStateTuition + "<br/>2. Out of State Tuition:" + OutStateTuition + "<br/>3. Fees and Other Expenses:" + FeesAndOtherExp + "<br/>4. Room and Board:" + RoomAndBoard + "<br/>5. Books:" + Books;
-                    ShowPopup(message);
+                    console.log('Input value:', inputValue);
+                    console.log('Row:', row_index);
+                    // send an AJAX request to the server with the updated data
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("GetCostChangeResult")',
+                        dataType: 'json',
+                        data: { credential_id: degree, instId: instCode, major_grouping_id: majorGroup, cipCode: majorCode, cost:inputValue },
+                        success: function (response) {
+                            var formattedCost = currencyFormatter.format(inputValue);
+                            var formattedRoi = isNaN(response.roi) ? response.roi : currencyFormatter.format(response.roi);
+                            console.log(response.roi + '-' + response.years_to_recoup_cost);
+                            //if (response.length == 1) {
+                            $('#input-' + row_index).val(formattedCost);
+                            $('#roi-' + row_index).text(formattedRoi);
+                            $('#years-' + row_index).text(response.years_to_recoup_cost);
+                            //$('#grade-' + row_index).text(response.grade);
+                            $("#divGrade").text(response.grade);
+                            //}
+                        },
+                        error: function (xhr, status, error) {
+                            console.log(error);
+                        }
+                    });
+                });
 
-                    //alert(message);
-                },
-                error: function (xhr, status, error) {
-                    console.log(error);
-                }
+                $('#pagination').on('click', 'a', function (event) {
+
+                    event.preventDefault();
+                    var page = $(this).data('page');
+                    console.log('Page:'+page);
+                    //var data = getDataForPage(page);
+                    $('#tblEarnings tbody').empty();
+                    GetValuesToReport(page);
+                });
+
+                $('#tblEarnings').on('click', 'button', function () {
+                    debugger;
+                    // get the value of the input field
+                    var row_index = $(this).closest("tr").index();
+                    var instCode = $(this).closest('tr').find('td:eq(6)').text();
+                    console.log('Row:', row_index);
+                    console.log('Code:', instCode);
+                    // send an AJAX request to the server with the updated data
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("GetCostBreakDown")',
+                        dataType: 'json',
+                        data: { instCode: instCode},
+                        success: function (response) {
+                            console.log(response);
+                            var InStateTuition = currencyFormatter.format(response.InStateTuition);
+                            var OutStateTuition = currencyFormatter.format(response.OutStateTuition);
+                            var FeesAndOtherExp = currencyFormatter.format(response.FeesAndOtherExp);
+                            var RoomAndBoard = currencyFormatter.format(response.RoomAndBoard);
+                            var Books = currencyFormatter.format(response.Books);
+                            var message = "1. In State Tuition:" + InStateTuition + "<br/>2. Out of State Tuition:" + OutStateTuition + "<br/>3. Fees and Other Expenses:" + FeesAndOtherExp + "<br/>4. Room and Board:" + RoomAndBoard + "<br/>5. Books:" + Books;
+                            ShowPopup(message);
+
+                            //alert(message);
+                        },
+                        error: function (xhr, status, error) {
+                            console.log(error);
+                        }
+                    });
+                });
             });
-        });
-    });
 
-    //$("body").on("click", ".Pager .page", function () {
-    //    GetEarningsDetails(parseInt($(this).attr('page')));
-    //});
-    function ShowPopup(message) {
-        $(function () {
-            $("#dialog").html(message);
-            $("#dialog").dialog({
-                title: "Cost Breakout for 1 year",
-                modal: true
-            });
-        });
-    };
-    function GetValuesToReport(pageIndex) {
-        var creddescs = [];
-        var instnms = [];
-        var major_grouping_descs = [];
-        var cipcodes = [];
+            //$("body").on("click", ".Pager .page", function () {
+            //    GetEarningsDetails(parseInt($(this).attr('page')));
+            //});
+            function ShowPopup(message) {
+                $(function () {
+                    $("#dialog").html(message);
+                    $("#dialog").dialog({
+                        title: "Cost Breakout for 1 year",
+                        modal: true
+                    });
+                });
+            };
+            function GetValuesToReport(pageIndex) {
+                var creddescs = [];
+                var instnms = [];
+                var major_grouping_descs = [];
+                var cipcodes = [];
 
-        var x = $("#creddesc").val();
-        creddescs.push(x);
-        console.log(creddescs.toString());
+                var x = $("#creddesc").val();
+                creddescs.push(x);
+                console.log(creddescs.toString());
 
-        var x = $("#instnm").val();
-        instnms.push(x);
-        console.log(instnms.toString());
+                var x = $("#instnm").val();
+                instnms.push(x);
+                console.log(instnms.toString());
 
-        var x = $("#major_grouping_desc").val();
-        major_grouping_descs.push(x);
-        console.log(major_grouping_descs.toString());
+                var x = $("#major_grouping_desc").val();
+                major_grouping_descs.push(x);
+                console.log(major_grouping_descs.toString());
 
-        var x = $("#major").val();
-        cipcodes.push(x);
-        console.log(cipcodes.toString());
+                var x = $("#major").val();
+                cipcodes.push(x);
+                console.log(cipcodes.toString());
 
-        GetEarningsDetails(pageIndex, creddescs, instnms, major_grouping_descs, cipcodes);
-    }
-    function GetEarningsDetails(pageIndex, creddesc, instnm, major_grouping_desc, cipCode) {
-        debugger;
-        var data = {};
-        data.pageIndex = pageIndex;
-        data.credential_id = creddesc;
-        data.instId = instnm;
-        data.major_grouping_id = major_grouping_desc;
-        data.cipCode = cipCode;
-        $.ajax({
-            type: "POST",
-            url: '@Url.Action("EarningDetails")',
-            data: JSON.stringify(data), //'{ pageIndex:' + pageIndex + ', credential_id:' + creddesc + ', instId:' + instnm + ', major_grouping_id:' + major_grouping_desc + ', cipCode:' + JSON.stringify(cipCode) +'}',
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
-            success: OnSuccess,
-            failure: function (response) {
-                //alert(response.d);
-            },
-            error: function (response) {
-                //alert(response.d);
+                GetEarningsDetails(pageIndex, creddescs, instnms, major_grouping_descs, cipcodes);
             }
-        });
-    }
-    function OnSuccess(response) {
-        $('#tblEarnings tbody').empty();
-        $("#divGrade").empty();
-        for (var i = 0; i < response.Reports.length; i++) {
-            //var earnings = this;
-            $("#divGrade").text(response.Reports[0]['grade']);
-            var formattedCost = currencyFormatter.format(response.Reports[i]['cost']);
-            var formattedEarnings = currencyFormatter.format(response.Reports[i]['earnings']);
-            var formattedRoi = isNaN(response.Reports[i]['roi']) ? response.Reports[i]['roi'] : currencyFormatter.format(response.Reports[i]['roi']);
+            function GetEarningsDetails(pageIndex, creddesc, instnm, major_grouping_desc, cipCode) {
+                debugger;
+                var data = {};
+                data.pageIndex = pageIndex;
+                data.credential_id = creddesc;
+                data.instId = instnm;
+                data.major_grouping_id = major_grouping_desc;
+                data.cipCode = cipCode;
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("EarningDetails")',
+                    data: JSON.stringify(data), //'{ pageIndex:' + pageIndex + ', credential_id:' + creddesc + ', instId:' + instnm + ', major_grouping_id:' + major_grouping_desc + ', cipCode:' + JSON.stringify(cipCode) +'}',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: OnSuccess,
+                    failure: function (response) {
+                        //alert(response.d);
+                    },
+                    error: function (response) {
+                        //alert(response.d);
+                    }
+                });
+            }
+            function OnSuccess(response) {
+                $('#tblEarnings tbody').empty();
+                $("#divGrade").empty();
+                for (var i = 0; i < response.Reports.length; i++) {
+                    //var earnings = this;
+                    $("#divGrade").text(response.Reports[0]['grade']);
+                    var formattedCost = currencyFormatter.format(response.Reports[i]['cost']);
+                    var formattedEarnings = currencyFormatter.format(response.Reports[i]['earnings']);
+                    var formattedRoi = isNaN(response.Reports[i]['roi']) ? response.Reports[i]['roi'] : currencyFormatter.format(response.Reports[i]['roi']);
+                    var row = '<tr>';
+                    /*
+                    row += '<td><input id="input-' + i + '" class="input-xs input-md" type="text" value="' + formattedCost + '"><button id="button-'+ i + '">Break Down</button></td>';
+                    row += '<td>' + formattedEarnings + '</td>';
+                    row += '<td id="roi-' + i + '">' + formattedRoi + '</td>';
+                    row += '<td id="years-' + i +'">' + response.Reports[i]['years_to_recoup_cost'] + '</td>';
+                    row += '<td>' + response.Reports[i]['equivalent'] + '</td>';
+                    row += '<td class="hiddenFiled">' + response.Reports[i]['degree'] + '</td>';
+                    row += '<td class="hiddenFiled">' + response.Reports[i]['instCode'] + '</td>';
+                    row += '<td class="hiddenFiled">' + response.Reports[i]['major_group'] + '</td>';
+                    row += '<td class="hiddenFiled">' + response.Reports[i]['majorcode'] + '</td>';
+                    row += '</tr>';
+                    */
 
-            var row = '<tr>';
-            row += '<td><input id="input-' + i + '" class="input-xs input-md" type="text" value="' + formattedCost + '"><button id="button-'+ i + '">Break Down</button></td>';
-            row += '<td>' + formattedEarnings + '</td>';
-            row += '<td id="roi-' + i + '">' + formattedRoi + '</td>';
-            row += '<td id="years-' + i +'">' + response.Reports[i]['years_to_recoup_cost'] + '</td>';
-            row += '<td>' + response.Reports[i]['equivalent'] + '</td>';
-            row += '<td class="hiddenFiled">' + response.Reports[i]['degree'] + '</td>';
-            row += '<td class="hiddenFiled">' + response.Reports[i]['instCode'] + '</td>';
-            row += '<td class="hiddenFiled">' + response.Reports[i]['major_group'] + '</td>';
-            row += '<td class="hiddenFiled">' + response.Reports[i]['majorcode'] + '</td>';
-            row += '</tr>';
-            $('#tblEarnings tbody').append(row);
-        }
-        generatePagination(response.RecordCount / 10, response.PageIndex);
-    }
-    function generatePagination(totalPages, currentPage) {
-        $('#pagination').empty();
-        for (var i = 1; i <= totalPages; i++) {
-            var activeClass = i == currentPage ? 'active' : '';
-            var link = '<a href="#" data-page="' + i + '" class="' + activeClass + '">' + i + '</a>';
-            $('#pagination').append(link);
-        }
-    }
+                    row += '<td>Expected Cost for this degree: <input id="input-' + i + '" class="input-xs input-md" type="text" value="' + formattedCost + '"><button id="button-' + i + '">Cost Breakout</button></td>';
+                    row += '<td class="hiddenFiled">' + response.Reports[i]['earnings'] + '</td>';
+                    row += '<td class="hiddenFiled">' + response.Reports[i]['roi'] + '</td>';
+                    row += '<td class="hiddenFiled">' + response.Reports[i]['years_to_recoup_cost'] + '</td>';
+                    row += '<td class="hiddenFiled">' + response.Reports[i]['equivalent'] + '</td>';
+                    row += '<td class="hiddenFiled">' + response.Reports[i]['degree'] + '</td>';
+                    row += '<td class="hiddenFiled">' + response.Reports[i]['instCode'] + '</td>';
+                    row += '<td class="hiddenFiled">' + response.Reports[i]['major_group'] + '</td>';
+                    row += '<td class="hiddenFiled">' + response.Reports[i]['majorcode'] + '</td>'; 
+                    row += '</tr>';
+                    row += '<td>Expected Earnings 1 year after graduation:' + formattedEarnings + '</td>';
+                    row += '</tr>';
+                    /*row += '<td id="roi-' + i + '">' + formattedRoi + '</td>';
+                    row += '</tr>';*/
+                    row += '<td id="years-' + i + '">' + response.Reports[i]['years_to_recoup_cost'] + '</td>';
+                    row += '</tr>';
+                    row += '<td>' + response.Reports[i]['equivalent'] + '</td>';
+                    row += '</tr>';
+
+                    
+
+                    $('#tblEarnings tbody').append(row);
+                }
+                generatePagination(response.RecordCount / 10, response.PageIndex);
+            }
+            function generatePagination(totalPages, currentPage) {
+                $('#pagination').empty();
+                for (var i = 1; i <= totalPages; i++) {
+                    var activeClass = i == currentPage ? 'active' : '';
+                    var link = '<a href="#" data-page="' + i + '" class="' + activeClass + '">' + i + '</a>';
+                    $('#pagination').append(link);
+                }
+            }
 </script>
 <link href="~/Content/css/select2.min.css" rel="stylesheet" />
 <script src="~/Scripts/select2.min.js"></script>

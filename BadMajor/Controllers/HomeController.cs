@@ -283,6 +283,7 @@ namespace BadMajor.Controllers
 	                            when a.fv - lower_bracket_fv - cost < 50000  then ''  --  SQLINES DEMO ***  F+ or F-
 	                            when b.fv <a.fv then '+'
 	                            when b.fv > a.fv then '-'
+                                else ''
                             end) grade,
                             CONCAT('You will earn about the same as others with a(n) ' ,x.creddesc) equivalent
                             from fct_major a

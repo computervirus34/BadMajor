@@ -1,7 +1,50 @@
-﻿<p>Data is sourced from the U.S. Department of Education.   
-    This data was last updated September 14, 2022.</p>
+﻿<p>
+    <u>Where do you get the data?</u>
+    <br />
+    The data used on this website is publicly available on the U.S. Department of Education website.
+    This data was last updated September 14, 2022.
+</p>
 
-<p>The letter grade is a proprietary calculation based on the cost and future value 
-    of your degree compared to what it would be if you did not pursue the degree. 
-    It is meant to provide a quick way to gauge the program you are considering. 
-    The calculations for ROI is based on the cost of your degree and expected earnings after graduation.</p>
+<p>
+    <u>What is the letter grade based on?</u>
+    <br />
+    The letter grade is meant to provide a quick way to gauge the program you are considering.
+    This is purely a numeric calculation based on the Return on Invstment (ROI) of your degree - i.e. the Return (expected earnings) on your Investment (cost of the degree). 
+    The algorithm uses the total cost of the program (which the user can modify), estimated lifetime earnings, and lost potential earnings 
+    over the years you are working on your degree. This generates a number that
+    is then compared to the same value for one degree lower. All values used are publicly available.
+</p>
+<p>
+    <u>How do you get Expected Cost?</u>
+    <br />
+    The cost is populated with the value found on the U.S. Department of Education Website.  It is the 
+    average annual total cost of attendance, including tuition and fees, books and supplies, and living expenses, minus the average grant/scholarship aid. 
+    It is calculated for all full-time, first-time, degree/certificate-seeking undergraduates who receive Title IV aid. 
+    It is included in the IPEDS Student Financial Aid component. Separate metrics are calculated for public institutions and private institutions. 
+    For public institutions, this metric is limited to full-time, first-time, degree/certificate-seeking undergraduates who pay in-state tuition and 
+    receive Title IV aid. For private institutions, it includes all full-time, first-time, degree/certificate-seeking undergraduates who receive Title IV aid. 
+    The total cost of attendance depends on whether full-time, first-time, degree/certificate-seeking undergraduates live on campus, off campus 
+    (not with family), or off campus (with family). For academic-year institutions, net price represents an average of all programs and includes 
+    only full-time, first-time, degree/certificate-seeking undergraduates who first enrolled in the fall term. For non-academic-year institutions 
+    (program or continuous enrollment), net price represents the program with the largest enrollment at the institution and it includes full-time, 
+    first-time, degree/certificate-seeking undergraduates who first enrolled at any time during the academic year. For programs less than 1 year in 
+    length, this represents the net price for the full program. 
+
+    The cost for each student is different due to scholarships, grants, living arrangements, etc., so the user is allowed to modify this value.  
+    When it is modified, the letter grade and time to recoup cost are updated automatically.
+    Click the "break out" button to see cost of tuition, books, room and board, and other fees.
+</p>
+<p>
+    <u>How do you get Expected Earnings?</u>
+    <br />
+    The U.S. Department of Education publishes the median earnings of graduates working and not enrolled 1 year after completing the degree program.
+    However, this value is sometimes unavailable. For instance, if a degree program is new and there are no data points for earnings, this value will be missing. 
+    In those cases, the averge value of earnings for that degree across all the other institutions in the U.S. is used as an approximation.
+</p>
+<p>
+    <u>How do you get the amount of time to recoup cost?</u>
+    <br />
+    If the earnings expected from the degree you are pursuing is less than one degree lower, then you are not likely to recoup the cost of the degree. You would be better off 
+    from a financial standpoint by not pursuing this particular degree.  If earnings are expected to be higher than you would get without it, then a formula using cost, earnings, 
+    and the earnings of one degree lower are used to calculate the number of years it will take to recoup the cost.
+</p>
