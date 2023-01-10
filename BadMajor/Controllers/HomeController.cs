@@ -67,26 +67,6 @@ namespace BadMajor.Controllers
             //Read SMTP section from Web.Config.
             SmtpSection smtpSection = (SmtpSection)ConfigurationManager.GetSection("system.net/mailSettings/smtp");
             SendEmail(smtpSection, model);
-            //using (MailMessage mm = new MailMessage(smtpSection.From, "ahsan34.07@gmail.com"))
-            //{
-            //    mm.Subject = model.Subject;
-            //    mm.Body = "Name: " + model.Name + "<br /><br />Email: " + model.Email + "<br />" + model.Body;
-
-            //    mm.IsBodyHtml = true;
-
-            //    using (SmtpClient smtp = new SmtpClient())
-            //    {
-            //        smtp.Host = smtpSection.Network.Host;
-            //        smtp.EnableSsl = smtpSection.Network.EnableSsl;
-            //        NetworkCredential networkCred = new NetworkCredential(smtpSection.Network.UserName, smtpSection.Network.Password);
-            //        smtp.UseDefaultCredentials = true;
-            //        smtp.Credentials = networkCred;
-            //        smtp.Port = smtpSection.Network.Port;
-            //        smtp.Send(mm);
-            //        ViewBag.Message = "Email sent sucessfully.";
-            //    }
-            //}
-
             return View();
         }
 
@@ -94,24 +74,26 @@ namespace BadMajor.Controllers
         {
             try
             {
-                using (MailMessage mail = new MailMessage())
+
+                var mailMessage = new MailMessage
                 {
-                    mail.From = new MailAddress(smtpSection.From);
-                    mail.To.Add(smtpSection.From);
-                    mail.Subject = contact.Subject;
-                    mail.Body = contact.Body;
-                    mail.IsBodyHtml = true;
-                    //mail.Attachments.Add(new Attachment("D:\\TestFile.txt"));//--Uncomment this to send any attachment  
-                    using (SmtpClient smtp = new SmtpClient(smtpSection.Network.Host, smtpSection.Network.Port))
-                    {
-                        smtp.Credentials = new NetworkCredential(smtpSection.From, smtpSection.Network.Password);
-                        smtp.EnableSsl = smtpSection.Network.EnableSsl;
-                        smtp.UseDefaultCredentials = smtpSection.Network.DefaultCredentials;
-                        smtp.Send(mail);
-                        ViewBag.Message = "Email sent sucessfully.";
-                    }
-                }
-            }catch(Exception ex)
+                    From = new MailAddress(smtpSection.From),
+                    Subject = contact.Subject,
+                    Body = contact.Body,
+                    IsBodyHtml = true,
+                };
+                mailMessage.To.Add(smtpSection.From);
+
+                var smtpClient = new SmtpClient(smtpSection.Network.Host)
+                {
+                    Port = 587,
+                    Credentials = new NetworkCredential(smtpSection.From, smtpSection.Network.Password),
+                    EnableSsl = true,
+                };
+                smtpClient.Send(mailMessage);
+                ViewBag.Message = "Email sent sucessfully.";
+            }
+            catch(Exception ex)
             {
                 ViewBag.Message = ex.Message;
             }

@@ -1,4 +1,4 @@
-﻿<p>STILL UNDER CONSTRUCTION </p>
+﻿@*<p>STILL UNDER CONSTRUCTION </p>*@
 @model BadMajor.ContactFormModel
 
 
@@ -10,6 +10,8 @@
         padding:5px 5px;
     }
 </style>
+<span style="color:green;font-weight:bold;font-size:12px;">@ViewBag.Message</span>
+
 <p style="padding-left:10px;">If you see any inaccuracies, missing majors, or general feedback, please contact us.</p>    
 <div>
 @using (Html.BeginForm("Contact", "Home", FormMethod.Post))
@@ -47,7 +49,6 @@
         </tr>
     </table>
     <br />
-    <span style="color:green">@ViewBag.Message</span>
 }
 </div>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/4.0.20/tinymce.min.js"></script>
