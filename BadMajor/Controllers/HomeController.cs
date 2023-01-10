@@ -79,7 +79,7 @@ namespace BadMajor.Controllers
                 {
                     From = new MailAddress(smtpSection.From),
                     Subject = contact.Subject,
-                    Body = contact.Body,
+                    Body = "Name: " + contact.Name + "<br /><br />Email: " + contact.Email + "<br />" + contact.Body,
                     IsBodyHtml = true,
                 };
                 mailMessage.To.Add(smtpSection.From);
