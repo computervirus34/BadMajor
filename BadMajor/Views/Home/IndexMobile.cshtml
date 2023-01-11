@@ -102,13 +102,13 @@
     <div class="col-md-2">
         @Html.LabelFor(model => model.creddesc, htmlAttributes: new { @class = "control-label ddlLabel" })
         @Html.DropDownListFor(model => model.creddesc, new SelectList(@Model.creddescList, "value", "text"),
-             new { @class = "form-control input-xs input-md" })
+             "--Select--",new { @class = "form-control input-xs input-md" })
         @Html.ValidationMessageFor(model => model.creddesc, "", new { @class = "text-danger" })
     </div>
     <div class="col-md-2">
         @Html.LabelFor(model => model.state, htmlAttributes: new { @class = "control-label ddlLabel" })
         @Html.DropDownListFor(model => model.state, new SelectList(@Model.stateList, "value", "text"),
-             new { @class = "form-control input-xs input-md" })
+             "--Select--", new { @class = "form-control input-xs input-md" })
         @Html.ValidationMessageFor(model => model.state, "", new { @class = "text-danger" })
     </div>
     <script type="text/javascript">
@@ -127,12 +127,15 @@
                     //$("#major_grouping_desc").prop("disabled", false);
                     $("#instnm").prop("disabled", false);
                     $("#instnm").empty();
+                    $("#major_grouping_desc").empty();
+                    $("#major").empty();
                     $.ajax({
                         type: 'POST',
                         url: '@Url.Action("getInstnm")',
                         dataType: 'json',
                         data: { states: states, credential_id: creddescs },
                         success: function (instnm) {
+                            $("#instnm").append('<option value="">--Select--</option>');
                             $.each(instnm, function (i, instnm) {
                                 $("#instnm").append('<option value="'
                                     + instnm.Value + '">'
@@ -163,14 +166,20 @@
                     console.log(instnms.toString());
 
                     $("#major_grouping_desc").prop("disabled", false);
+
+                    //if ($("#major_grouping_desc").val() == null) {
+                    //    return false;
+                    //}
                     //$("#instnm").prop("disabled", false);
                     $("#major_grouping_desc").empty();
+                    $("#major").empty();
                     $.ajax({
                         type: 'POST',
                         url: '@Url.Action("GetMajorGroup")',
                         dataType: 'json',
                         data: { insts: instnms },
                         success: function (majorgroups) {
+                            $("#major_grouping_desc").append('<option value="">--Select--</option>');
                             $.each(majorgroups, function (i, majorgroups) {
                                 $("#major_grouping_desc").append('<option value="'
                                     + majorgroups.Value + '">'
@@ -181,6 +190,8 @@
                             //alert('Failed.' + ex);
                         }
                     });
+                    //$("#major_grouping_desc").val($("#major_grouping_desc option:first").val());
+                    //$("#major_grouping_desc").trigger("chnage");
                 });
                 return false;
             });
@@ -219,6 +230,7 @@
                         dataType: 'json',
                         data: { credential_id: creddescs, instId: instnms, major_grouping_id: major_grouping_descs },
                         success: function (major) {
+                            $("#major").append('<option value="">--Select--</option>');
                             $.each(major, function (i, major) {
                                 $("#major").append('<option value="'
                                     + major.Value + '">'
